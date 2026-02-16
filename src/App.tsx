@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { ShieldAlert, ShieldCheck, AlertTriangle, Loader2, Info } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, AlertTriangle, Loader2, Info, Sparkles } from 'lucide-react';
 import type { AnalysisResult, AnalyzeRequest } from './types';
+import EducationalSection from './EducationalSection';
 
 function App() {
   const [headers, setHeaders] = useState('');
@@ -10,22 +11,16 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   
   const [showHeaderInfo, setShowHeaderInfo] = useState(false);
-  
-  // Create a reference to the help container so we can detect clicks outside of it
   const helpRef = useRef<HTMLDivElement>(null);
 
-  // This effect listens for clicks anywhere on the page
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (helpRef.current && !helpRef.current.contains(event.target as Node)) {
-        setShowHeaderInfo(false); // Close the box if the click was outside the ref
+        setShowHeaderInfo(false);
       }
     }
-
-    // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Unbind the event listener on clean up
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [helpRef]);
@@ -57,136 +52,159 @@ function App() {
 
   const getVerdictColor = (verdict: string) => {
     switch (verdict) {
-      case 'Safe': return 'text-green-600 bg-green-100';
-      case 'Suspicious': return 'text-yellow-600 bg-yellow-100';
-      case 'Phishing': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'Safe': return 'text-green-700 bg-green-100 border-green-200';
+      case 'Suspicious': return 'text-yellow-700 bg-yellow-100 border-yellow-200';
+      case 'Phishing': return 'text-red-700 bg-red-100 border-red-200';
+      default: return 'text-slate-700 bg-slate-100 border-slate-200';
     }
   };
 
   return (
-    <div className="min-h-screen p-8 text-gray-800 font-sans">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-16 pt-8 selection:bg-blue-200">
+      <div className="max-w-5xl mx-auto px-4 space-y-12">
         
-        {/* Header */}
-        <div className="text-center space-y-2 mb-8">
-          <h1 className="text-4xl font-bold flex justify-center items-center gap-3">
-            <ShieldAlert className="w-10 h-10 text-blue-600" />
-            Phish Wächter AI
-          </h1>
-          <p className="text-gray-500">Paste email headers and body below for instant threat analysis.</p>
-        </div>
-
-        {/* Input Area */}
-        <div className="grid md:grid-cols-2 gap-4">
+        {/* Main App Container */}
+        <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
           
-          {/* Headers Column */}
-          <div className="flex flex-col gap-2">
+          {/* Header */}
+          <div className="text-center space-y-4 mb-10">
+            <h1 className="text-4xl md:text-5xl font-extrabold flex justify-center items-center gap-3 tracking-tight text-slate-900">
+              <ShieldAlert className="w-12 h-12 text-blue-600" />
+              Phish Wächter AI
+            </h1>
             
-            {/* Added relative positioning and the ref to this container */}
-            <div className="flex items-center justify-between relative" ref={helpRef}>
-              <label className="font-semibold text-sm">Raw Email Headers (Optional)</label>
-              
-              <button 
-                onClick={() => setShowHeaderInfo(!showHeaderInfo)}
-                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium transition-colors"
-                title="Where do I find headers?"
-              >
-                <Info className="w-4 h-4" />
-                Help
-              </button>
+            {/* Gemini Badge */}
+            <div className="flex justify-center">
+              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold border border-blue-100 shadow-sm">
+                <Sparkles className="w-4 h-4 text-blue-500" />
+                Powered by Google Gemini
+              </span>
+            </div>
+            <p className="text-slate-500 max-w-xl mx-auto text-lg">
+              Paste the email headers and body below for an instant, AI-driven threat analysis.
+            </p>
+          </div>
 
-              {/* The Info Card (Now Absolutely Positioned) */}
-              {showHeaderInfo && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg text-sm shadow-xl z-10 animate-in fade-in zoom-in-95">
-                  <p className="font-bold mb-2">Where do I find headers?</p>
-                  <ol className="list-decimal pl-4 space-y-1.5">
-                    <li>In Gmail, open the email you want to check.</li>
-                    <li>Click the <strong>three vertical dots</strong> (More) in the top right corner of the email.</li>
-                    <li>Select <strong>"Show original"</strong>.</li>
-                    <li>Copy all the text from the very top down to the line that says <strong>MIME-Version</strong>.</li>
-                  </ol>
-                </div>
-              )}
+          {/* Input Area */}
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {/* Headers Column */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between relative" ref={helpRef}>
+                <label className="font-semibold text-sm text-slate-700">Raw Email Headers (Optional)</label>
+                <button 
+                  onClick={() => setShowHeaderInfo(!showHeaderInfo)}
+                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium transition-colors bg-blue-50 px-2 py-1 rounded-md"
+                  title="Where do I find headers?"
+                >
+                  <Info className="w-4 h-4" />
+                  Help
+                </button>
+
+                {/* The Info Card */}
+                {showHeaderInfo && (
+                  <div className="absolute top-full right-0 mt-2 w-80 bg-slate-800 text-slate-100 p-5 rounded-xl text-sm shadow-2xl z-10 animate-in fade-in zoom-in-95 border border-slate-700">
+                    <p className="font-bold mb-3 text-blue-300">Where do I find headers?</p>
+                    <ol className="list-decimal pl-4 space-y-2">
+                      <li>For Gmail, open the suspicious email.</li>
+                      <li>Click the <strong>three vertical dots</strong> (More) in the top right corner.</li>
+                      <li>Select <strong>"Show original"</strong>.</li>
+                      <li>Copy all the text from the top down to the line that says <strong>MIME-Version</strong>.</li>
+                    </ol>
+                  </div>
+                )}
+              </div>
+              <textarea 
+                className="p-4 border border-slate-200 rounded-xl h-64 font-mono text-xs md:text-sm resize-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-slate-50 transition-all placeholder:text-slate-400"
+                placeholder="Return-Path: <scammer@fake.com>..."
+                value={headers}
+                onChange={(e) => setHeaders(e.target.value)}
+              />
             </div>
 
-            <textarea 
-              className="p-3 border rounded-lg h-64 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-              placeholder="Return-Path: <scammer@fake.com>..."
-              value={headers}
-              onChange={(e) => setHeaders(e.target.value)}
-            />
+            {/* Body Column */}
+            <div className="flex flex-col gap-2">
+              <label className="font-semibold text-sm text-slate-700">Email Body</label>
+              <textarea 
+                className="p-4 border border-slate-200 rounded-xl h-64 resize-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-slate-50 transition-all placeholder:text-slate-400"
+                placeholder="Dear customer, your account has been compromised. Please click the link below to verify your identity..."
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+              />
+            </div>
           </div>
 
-          {/* Body Column */}
-          <div className="flex flex-col gap-2">
-            <label className="font-semibold text-sm">Email Body</label>
-            <textarea 
-              className="p-3 border rounded-lg h-64 resize-none focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-              placeholder="Dear customer, your account has been compromised..."
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-            />
-          </div>
+          {/* Action Button */}
+          <button 
+            onClick={handleAnalyze}
+            disabled={isLoading || (!headers && !body)}
+            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-[0.99] text-lg"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-6 h-6 animate-spin" />
+                Analyzing Threat...
+              </>
+            ) : 'Analyze Email'}
+          </button>
+
+          {error && <div className="mt-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-center font-medium animate-in fade-in">{error}</div>}
+
+          {/* Results Dashboard */}
+          {result && (
+            <div className="mt-8 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-8 animate-in fade-in slide-in-from-bottom-4">
+              
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 border-b border-slate-100 pb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">Analysis Complete</h2>
+                  <p className="text-sm text-slate-500 mt-1 max-w-xl">{result.headerAnalysis}</p>
+                </div>
+                <div className={`px-6 py-2 rounded-full font-bold text-lg border shadow-sm ${getVerdictColor(result.verdict)}`}>
+                  {result.verdict}
+                </div>
+              </div>
+
+              {/* Threat Meter */}
+              <div className="space-y-3 bg-slate-50 p-5 rounded-xl border border-slate-100">
+                <div className="flex justify-between font-bold text-sm text-slate-700">
+                  <span>Threat Level</span>
+                  <span className={result.confidenceScore > 70 ? 'text-red-600' : result.confidenceScore > 30 ? 'text-yellow-600' : 'text-green-600'}>
+                    {result.confidenceScore}%
+                  </span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-1000 ease-out ${result.confidenceScore > 70 ? 'bg-red-500' : result.confidenceScore > 30 ? 'bg-yellow-500' : 'bg-green-500'}`} 
+                    style={{ width: `${result.confidenceScore}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Findings Grid */}
+              <div className="grid md:grid-cols-2 gap-6 pt-2">
+                <div className="space-y-4 bg-red-50/50 p-5 rounded-xl border border-red-100">
+                  <h3 className="font-bold flex items-center gap-2 text-red-800">
+                    <AlertTriangle className="w-5 h-5" /> Red Flags Detected
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700 marker:text-red-400">
+                    {result.redFlags.length > 0 ? result.redFlags.map((flag, i) => <li key={i}>{flag}</li>) : <li>No specific red flags detected.</li>}
+                  </ul>
+                </div>
+                <div className="space-y-4 bg-green-50/50 p-5 rounded-xl border border-green-100">
+                  <h3 className="font-bold flex items-center gap-2 text-green-800">
+                    <ShieldCheck className="w-5 h-5" /> Safe Indicators
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700 marker:text-green-400">
+                    {result.safePoints.length > 0 ? result.safePoints.map((point, i) => <li key={i}>{point}</li>) : <li>No specific safe indicators detected.</li>}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Action Button */}
-        <button 
-          onClick={handleAnalyze}
-          disabled={isLoading || (!headers && !body)}
-          className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transition-colors"
-        >
-          {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Analyze Email'}
-        </button>
+        {/* info part */}
+        <EducationalSection />
 
-        {error && <div className="p-4 bg-red-100 text-red-700 rounded-lg text-center font-medium">{error}</div>}
-
-        {/* Results Dashboard */}
-        {result && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border space-y-6">
-            <div className="flex justify-between items-center border-b pb-4">
-              <div>
-                <h2 className="text-2xl font-bold">Analysis Complete</h2>
-                <p className="text-sm text-gray-500 mt-1">{result.headerAnalysis}</p>
-              </div>
-              <div className={`px-4 py-2 rounded-full font-bold text-lg ${getVerdictColor(result.verdict)}`}>
-                {result.verdict}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between font-semibold text-sm">
-                <span>Threat Level</span>
-                <span>{result.confidenceScore}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div 
-                  className={`h-4 rounded-full transition-all duration-1000 ${result.confidenceScore > 70 ? 'bg-red-500' : result.confidenceScore > 30 ? 'bg-yellow-500' : 'bg-green-500'}`} 
-                  style={{ width: `${result.confidenceScore}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6 pt-2">
-              <div className="space-y-3">
-                <h3 className="font-bold flex items-center gap-2 text-red-700">
-                  <AlertTriangle className="w-5 h-5" /> Red Flags
-                </h3>
-                <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                  {result.redFlags.length > 0 ? result.redFlags.map((flag, i) => <li key={i}>{flag}</li>) : <li>None detected.</li>}
-                </ul>
-              </div>
-              <div className="space-y-3">
-                <h3 className="font-bold flex items-center gap-2 text-green-700">
-                  <ShieldCheck className="w-5 h-5" /> Safe Indicators
-                </h3>
-                <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                  {result.safePoints.length > 0 ? result.safePoints.map((point, i) => <li key={i}>{point}</li>) : <li>None detected.</li>}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -18,13 +18,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     You are an expert cybersecurity analyst. Analyze the following email headers and body for phishing indicators. 
     Look for domain mismatches, urgency cues, SPF/DKIM/DMARC failures, and suspicious links.
     
+    CRITICAL INSTRUCTION: Keep all text responses extremely concise, punchy, and direct. Do not use conversational filler.
+
     Respond ONLY in valid JSON format using this exact schema:
     {
       "confidenceScore": number (0-100, 100 being definite phishing),
       "verdict": string ("Safe", "Suspicious", or "Phishing"),
-      "redFlags": array of strings (specific suspicious findings),
-      "safePoints": array of strings (legitimate aspects found),
-      "headerAnalysis": string (brief summary of technical origin)
+      "redFlags": array of strings (very short, specific suspicious findings. Max 10 words per item),
+      "safePoints": array of strings (very short legitimate aspects found. Max 10 words per item),
+      "headerAnalysis": string (1 to 2 short sentences summarizing the technical origin and authentication results)
     }
 
     Email Headers:
