@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MailCheck, ShieldCheck, AlertTriangle, Loader2, Info, Sparkles } from 'lucide-react';
+import { MailCheck, ShieldCheck, AlertTriangle, Loader2, Info, Sparkles, Github } from 'lucide-react';
 import type { AnalysisResult, AnalyzeRequest } from './types';
 import EducationalSection from './EducationalSection';
 
@@ -74,11 +74,23 @@ function App() {
             </h1>
             
             {/* Gemini Badge */}
-            <div className="flex justify-center">
+            <div className="flex flex-wrap justify-center gap-3">
+              {/* Gemini Badge */}
               <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold border border-blue-100 shadow-sm">
                 <Sparkles className="w-4 h-4 text-blue-500" />
                 Powered by Google Gemini
               </span>
+              
+              {/* GitHub Source Badge */}
+              <a 
+                href="https://github.com/AnshulBirwal/PhishWaechterAI" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm font-semibold border border-slate-200 shadow-sm hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer"
+              >
+                <Github className="w-4 h-4" />
+                View Source Code
+              </a>
             </div>
             <p className="text-slate-500 max-w-xl mx-auto text-lg">
               Paste the email headers and body below for an instant, AI-driven threat analysis.
