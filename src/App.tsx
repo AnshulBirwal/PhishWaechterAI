@@ -216,6 +216,13 @@ function App() {
 
         {/* info part */}
         <EducationalSection />
+        
+        {/* Footer */}
+        <div className="text-center pt-10 pb-4">
+          <p className="text-slate-500 text-sm">
+            Developed by <a href="https://anshulbirwal.de" target="_blank" rel="noopener noreferrer" className="font-bold text-slate-700 hover:text-blue-600 hover:underline transition-colors">AnshulBirwal</a>
+          </p>
+        </div>
 
       </div>
     </div>
