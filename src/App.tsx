@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ShieldAlert, ShieldCheck, AlertTriangle, Loader2 } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { ShieldAlert, ShieldCheck, AlertTriangle, Loader2, Info } from 'lucide-react';
 import type { AnalysisResult, AnalyzeRequest } from './types';
 
 function App() {
@@ -8,6 +8,27 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const [showHeaderInfo, setShowHeaderInfo] = useState(false);
+  
+  // Create a reference to the help container so we can detect clicks outside of it
+  const helpRef = useRef<HTMLDivElement>(null);
+
+  // This effect listens for clicks anywhere on the page
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (helpRef.current && !helpRef.current.contains(event.target as Node)) {
+        setShowHeaderInfo(false); // Close the box if the click was outside the ref
+      }
+    }
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [helpRef]);
 
   const handleAnalyze = async () => {
     setIsLoading(true);
@@ -47,17 +68,48 @@ function App() {
     <div className="min-h-screen p-8 text-gray-800 font-sans">
       <div className="max-w-4xl mx-auto space-y-6">
         
+        {/* Header */}
         <div className="text-center space-y-2 mb-8">
           <h1 className="text-4xl font-bold flex justify-center items-center gap-3">
             <ShieldAlert className="w-10 h-10 text-blue-600" />
-            AI Phishing Detector
+            Phish Wächter AI
           </h1>
           <p className="text-gray-500">Paste email headers and body below for instant threat analysis.</p>
         </div>
 
+        {/* Input Area */}
         <div className="grid md:grid-cols-2 gap-4">
+          
+          {/* Headers Column */}
           <div className="flex flex-col gap-2">
-            <label className="font-semibold text-sm">Raw Email Headers (Optional)</label>
+            
+            {/* Added relative positioning and the ref to this container */}
+            <div className="flex items-center justify-between relative" ref={helpRef}>
+              <label className="font-semibold text-sm">Raw Email Headers (Optional)</label>
+              
+              <button 
+                onClick={() => setShowHeaderInfo(!showHeaderInfo)}
+                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium transition-colors"
+                title="Where do I find headers?"
+              >
+                <Info className="w-4 h-4" />
+                Help
+              </button>
+
+              {/* The Info Card (Now Absolutely Positioned) */}
+              {showHeaderInfo && (
+                <div className="absolute top-full right-0 mt-2 w-80 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg text-sm shadow-xl z-10 animate-in fade-in zoom-in-95">
+                  <p className="font-bold mb-2">Where do I find headers?</p>
+                  <ol className="list-decimal pl-4 space-y-1.5">
+                    <li>In Gmail, open the email you want to check.</li>
+                    <li>Click the <strong>three vertical dots</strong> (More) in the top right corner of the email.</li>
+                    <li>Select <strong>"Show original"</strong>.</li>
+                    <li>Copy all the text from the very top down to the line that says <strong>MIME-Version</strong>.</li>
+                  </ol>
+                </div>
+              )}
+            </div>
+
             <textarea 
               className="p-3 border rounded-lg h-64 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none bg-white"
               placeholder="Return-Path: <scammer@fake.com>..."
@@ -65,6 +117,8 @@ function App() {
               onChange={(e) => setHeaders(e.target.value)}
             />
           </div>
+
+          {/* Body Column */}
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-sm">Email Body</label>
             <textarea 
@@ -76,6 +130,7 @@ function App() {
           </div>
         </div>
 
+        {/* Action Button */}
         <button 
           onClick={handleAnalyze}
           disabled={isLoading || (!headers && !body)}
@@ -86,6 +141,7 @@ function App() {
 
         {error && <div className="p-4 bg-red-100 text-red-700 rounded-lg text-center font-medium">{error}</div>}
 
+        {/* Results Dashboard */}
         {result && (
           <div className="bg-white p-6 rounded-xl shadow-sm border space-y-6">
             <div className="flex justify-between items-center border-b pb-4">
@@ -105,7 +161,7 @@ function App() {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-4">
                 <div 
-                  className={`h-4 rounded-full ${result.confidenceScore > 70 ? 'bg-red-500' : result.confidenceScore > 30 ? 'bg-yellow-500' : 'bg-green-500'}`} 
+                  className={`h-4 rounded-full transition-all duration-1000 ${result.confidenceScore > 70 ? 'bg-red-500' : result.confidenceScore > 30 ? 'bg-yellow-500' : 'bg-green-500'}`} 
                   style={{ width: `${result.confidenceScore}%` }}
                 ></div>
               </div>
