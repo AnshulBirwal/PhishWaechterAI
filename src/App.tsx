@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ShieldAlert, ShieldCheck, AlertTriangle, Loader2, Info, Sparkles } from 'lucide-react';
+import { MailCheck, ShieldCheck, AlertTriangle, Loader2, Info, Sparkles } from 'lucide-react';
 import type { AnalysisResult, AnalyzeRequest } from './types';
 import EducationalSection from './EducationalSection';
 
@@ -69,7 +69,7 @@ function App() {
           {/* Header */}
           <div className="text-center space-y-4 mb-10">
             <h1 className="text-4xl md:text-5xl font-extrabold flex justify-center items-center gap-3 tracking-tight text-slate-900">
-              <ShieldAlert className="w-12 h-12 text-blue-600" />
+              <MailCheck className="w-12 h-12 text-blue-600" />
               Phish Wächter AI
             </h1>
             
