@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MailCheck, ShieldCheck, AlertTriangle, Loader2, Info, Sparkles, Github } from 'lucide-react';
+import { MailCheck, ShieldCheck, AlertTriangle, Loader2, Info, Sparkles, Github, Lock, AlertCircle } from 'lucide-react';
 import type { AnalysisResult, AnalyzeRequest } from './types';
 import EducationalSection from './EducationalSection';
 
@@ -26,7 +26,7 @@ function App() {
   }, [helpRef]);
 
   const redactPII = (rawHeaders: string, rawBody: string) => {
-    // 1. Find the user's email in the "Delivered-To:" or "To:" header
+    // extract and scrub the target user's email address
     const deliveredToMatch = rawHeaders.match(/^Delivered-To:\s*<?([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)>?/im);
     const toMatch = rawHeaders.match(/^To:\s*.*?<?([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)>?/im);
 
@@ -37,13 +37,22 @@ function App() {
     let safeHeaders = rawHeaders;
     let safeBody = rawBody;
 
-    // 2. Replacing all instances of those emails with a placeholder
     targetEmails.forEach((email) => {
-      const safeEmailRegex = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
+      const safeEmailRegex = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
       const regex = new RegExp(safeEmailRegex, 'gi');
-      safeHeaders = safeHeaders.replace(regex, '[REDACTED_USER]');
-      safeBody = safeBody.replace(regex, '[REDACTED_USER]');
+      safeHeaders = safeHeaders.replace(regex, '[REDACTED_USER_EMAIL]');
+      safeBody = safeBody.replace(regex, '[REDACTED_USER_EMAIL]');
     });
+
+    // advanced Data Loss Prevention (DLP) Regex Patterns
+    const phoneRegex = /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g;
+    const ccRegex = /\b(?:\d[ -]*?){13,16}\b/g;
+    const idRegex = /\b\d{3}-\d{2}-\d{4}\b/g; // Standard US SSN format (adaptable)
+
+    // Apply DLP scrubbing to the email body
+    safeBody = safeBody.replace(phoneRegex, '[REDACTED_PHONE]');
+    safeBody = safeBody.replace(ccRegex, '[REDACTED_CREDIT_CARD]');
+    safeBody = safeBody.replace(idRegex, '[REDACTED_ID_NUMBER]');
 
     return { safeHeaders, safeBody };
   };
@@ -185,6 +194,19 @@ function App() {
               </>
             ) : 'Analyze Email'}
           </button>
+
+          <div className="flex items-start justify-center gap-2 mt-4 text-slate-500 text-xs text-center max-w-lg mx-auto">
+            <Lock className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+            <p>
+              <strong>Privacy First:</strong> Your email, phone numbers, and financial data are scrubbed locally by the script in your browser before being analyzed. We log zero data.
+            </p>
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p>
+                <strong>Disclaimer:</strong> AI can make mistakes. Always verify with your IT department if an email seems suspicious.
+              </p>
+            </div>
+          </div>
 
           {error && <div className="mt-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-center font-medium animate-in fade-in">{error}</div>}
 
