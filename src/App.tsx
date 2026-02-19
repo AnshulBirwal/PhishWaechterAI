@@ -25,12 +25,39 @@ function App() {
     };
   }, [helpRef]);
 
+  const redactPII = (rawHeaders: string, rawBody: string) => {
+    // 1. Find the user's email in the "Delivered-To:" or "To:" header
+    const deliveredToMatch = rawHeaders.match(/^Delivered-To:\s*<?([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)>?/im);
+    const toMatch = rawHeaders.match(/^To:\s*.*?<?([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)>?/im);
+
+    const targetEmails = [];
+    if (deliveredToMatch && deliveredToMatch[1]) targetEmails.push(deliveredToMatch[1]);
+    if (toMatch && toMatch[1]) targetEmails.push(toMatch[1]);
+
+    let safeHeaders = rawHeaders;
+    let safeBody = rawBody;
+
+    // 2. Replacing all instances of those emails with a placeholder
+    targetEmails.forEach((email) => {
+      const safeEmailRegex = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
+      const regex = new RegExp(safeEmailRegex, 'gi');
+      safeHeaders = safeHeaders.replace(regex, '[REDACTED_USER]');
+      safeBody = safeBody.replace(regex, '[REDACTED_USER]');
+    });
+
+    return { safeHeaders, safeBody };
+  };
+
   const handleAnalyze = async () => {
     setIsLoading(true);
     setError(null);
     setResult(null);
 
-    const payload: AnalyzeRequest = { emailHeaders: headers, emailBody: body };
+    // remvong the user's email for privacy
+    const { safeHeaders, safeBody } = redactPII(headers, body);
+
+    // sending the clean data
+    const payload: AnalyzeRequest = { emailHeaders: safeHeaders, emailBody: safeBody };
 
     try {
       const res = await fetch('/api/analyze', {
