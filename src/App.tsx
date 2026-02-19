@@ -195,15 +195,18 @@ function App() {
             ) : 'Analyze Email'}
           </button>
 
-          <div className="flex items-start justify-center gap-2 mt-4 text-slate-500 text-xs text-center max-w-lg mx-auto">
-            <Lock className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
-            <p>
-              <strong>Privacy First:</strong> Your email, phone numbers, and financial data are scrubbed locally by the script in your browser before being analyzed. We log zero data.
-            </p>
+          {/* Trust & Safety Badges */}
+          <div className="flex flex-col items-center justify-center gap-3 mt-6 text-slate-500 text-xs text-center max-w-xl mx-auto border-t border-slate-100 pt-6">
+            <div className="flex items-start gap-2">
+              <Lock className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+              <p>
+                <strong>Privacy First:</strong> Your email, phone numbers, and financial data are automatically scrubbed locally in your browser before being analyzed.
+              </p>
+            </div>
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <p>
-                <strong>Disclaimer:</strong> AI can make mistakes. Always verify with your IT department if an email seems suspicious.
+                <strong>Disclaimer:</strong> AI can make mistakes. Verify with your IT department if an email seems suspicious.
               </p>
             </div>
           </div>
