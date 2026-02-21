@@ -153,7 +153,7 @@ function App() {
                   <div className="absolute top-full right-0 mt-2 w-80 bg-slate-800 text-slate-100 p-5 rounded-xl text-sm shadow-2xl z-10 animate-in fade-in zoom-in-95 border border-slate-700">
                     <p className="font-bold mb-3 text-blue-300">Where do I find headers?</p>
                     <ol className="list-decimal pl-4 space-y-2">
-                      <li>For Gmail, open the suspicious email.</li>
+                      <li>For instance, in case of Gmail (web), open the suspicious email.</li>
                       <li>Click the <strong>three vertical dots</strong> (More) in the top right corner.</li>
                       <li>Select <strong>"Show original"</strong>.</li>
                       <li>Copy all the text from the top down to the line that says <strong>MIME-Version</strong>.</li>
